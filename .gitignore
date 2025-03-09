@@ -1,0 +1,43 @@
+# Ignore build output and dependencies
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+*.log
+*.cache
+*.lock.json
+
+# Ignore local configuration files
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Ignore user secrets (Windows & macOS)
+.microsoft/usersecrets/
+**/secrets/
+
+# Ignore ASP.NET HTTPS Certificates
+aspnetapp.pfx
+https/
+.aspnet/
+*.crt
+*.key
+*.pem
+
+# Ignore Docker artifacts
+docker-compose.override.yml
+.env
+.dockerignore
+**/docker-compose.debug.yml
+
+# Ignore VS Code and JetBrains IDE files
+.vscode/
+.idea/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+.containers
