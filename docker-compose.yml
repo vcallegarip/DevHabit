@@ -9,3 +9,26 @@ services:
     ports:
       - 8030:8030
       - 8031:8031
+    environment:
+      # - ASPNETCORE_URLS=http://+:8030;https://+:8031
+      - ASPNETCORE_URLS=http://+:8030
+      # Seq
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+
+  devhabit.seq:
+    image: datalust/seq:2024.3 # or latest
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./.containers/seq_data:/data
+    ports:
+      # - 8030:80
+      - 5341:80
+
+  devhabit.aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
+    ports:
+      - 18888:18888
