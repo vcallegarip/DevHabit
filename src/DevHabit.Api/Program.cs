@@ -1,10 +1,32 @@
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers(); // Register controller support
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddControllers(); // Register controller support
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(builder.Environment.ApplicationName))
+    .WithTracing(tracing => tracing
+        .AddHttpClientInstrumentation()
+        .AddAspNetCoreInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddHttpClientInstrumentation()
+        .AddAspNetCoreInstrumentation()
+        .AddRuntimeInstrumentation())
+    .UseOtlpExporter();
+
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options.IncludeScopes = true;
+    options.IncludeFormattedMessage = true;
+});
 
 WebApplication app = builder.Build();
 
