@@ -10,11 +10,23 @@ services:
       - 8030:8030
       - 8031:8031
     environment:
-      # - ASPNETCORE_URLS=http://+:8030;https://+:8031
-      - ASPNETCORE_URLS=http://+:8030
       # Seq
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
-      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      # - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
+      # - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      # Aspire Dashboard
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.aspire-dashboard:18889
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+
+  devhabit.postgres:
+    image: postgres:17.2 # or latest
+    environment:
+      POSTGRES_DB: devhabit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./.containers/postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
   devhabit.seq:
     image: datalust/seq:2024.3 # or latest
@@ -32,3 +44,7 @@ services:
       DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
     ports:
       - 18888:18888
+
+
+# docker compose -f docker-compose.yml -f docker-compose.debug.yml up --build
+# docker exec -it devhabit-devhabit.api-1 printenv ASPNETCORE_ENVIRONMENT

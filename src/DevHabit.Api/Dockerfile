@@ -13,25 +13,48 @@ USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG configuration=Release
 WORKDIR /src
+
+# Copy project files
 COPY ["Directory.Packages.props", "."]
 COPY ["Directory.Build.props", "."]
 COPY ["src/DevHabit.Api/DevHabit.Api.csproj", "src/DevHabit.Api/"]
+
+# Restore dependencies
 RUN dotnet restore "src/DevHabit.Api/DevHabit.Api.csproj"
+
+# Copy all source
 COPY . .
+
+# Optional: Install vsdbg for Debug configuration
+RUN if [ "$configuration" = "Debug" ]; then \
+    apt-get update && \
+    apt-get install -y curl unzip && \
+    curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l /vsdbg ; \
+    fi
+
+# Build the app
 WORKDIR "/src/src/DevHabit.Api"
 RUN dotnet build "DevHabit.Api.csproj" -c $configuration -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
+# -------- Publish stage --------
 FROM build AS publish
 ARG configuration=Release
 RUN dotnet publish "DevHabit.Api.csproj" -c $configuration -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# -------- Final runtime stage --------
 FROM base AS final
+ARG configuration=Release
 WORKDIR /app
+
 COPY --from=publish /app/publish .
+
+# If debug build, bring in vsdbg
+COPY --from=build /vsdbg /vsdbg
+
 ENTRYPOINT ["dotnet", "DevHabit.Api.dll"]
 
-USER root
-RUN apt-get update && apt-get install -y curl unzip && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v 17.0.10712.2 -l /vsdbg
-USER app
+# USER root
+# RUN apt-get update && apt-get install -y curl unzip && curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v 17.0.10712.2 -l /vsdbg
+# USER app
