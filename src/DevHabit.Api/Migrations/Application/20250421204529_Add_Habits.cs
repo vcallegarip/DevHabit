@@ -59,6 +59,23 @@ namespace DevHabit.Api.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "users",
+                schema: "dev_habit",
+                columns: table => new
+                {
+                    id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    email = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: false),
+                    name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    created_at_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    identity_id = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "habit_tags",
                 schema: "dev_habit",
                 columns: table => new
@@ -98,6 +115,20 @@ namespace DevHabit.Api.Migrations.Application
                 table: "tags",
                 column: "name",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_email",
+                schema: "dev_habit",
+                table: "users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_users_identity_id",
+                schema: "dev_habit",
+                table: "users",
+                column: "identity_id",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -105,6 +136,10 @@ namespace DevHabit.Api.Migrations.Application
         {
             migrationBuilder.DropTable(
                 name: "habit_tags",
+                schema: "dev_habit");
+
+            migrationBuilder.DropTable(
+                name: "users",
                 schema: "dev_habit");
 
             migrationBuilder.DropTable(

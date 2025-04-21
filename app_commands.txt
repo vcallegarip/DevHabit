@@ -1,0 +1,5 @@
+docker build --build-arg configuration=Debug -f src/DevHabit.Api/Dockerfile .
+docker exec -it devhabit-devhabit.api-1 printenv ASPNETCORE_ENVIRONMENT      
+dotnet ef migrations add Add_Habits --context ApplicationDbContext --output-dir Migrations/Application --project src/DevHabit.Api
+dotnet ef migrations add Add_Identity --context ApplicationIdentityDbContext --output-dir Migrations/Identity --project src/DevHabit.Api
+docker compose -f docker-compose.yml -f docker-compose.debug.yml up --build 
