@@ -2,6 +2,7 @@
 
 services:
   devhabit.api:
+    container_name: devhabit.api
     image: ${DOCKER_REGISTRY-}devhabitapi
     build:
       context: .
@@ -9,6 +10,8 @@ services:
     ports:
       - 8030:8030
       - 8031:8031
+    depends_on:
+      - devhabit.postgres
     environment:
       # Seq
       # - OTEL_EXPORTER_OTLP_ENDPOINT=http://devhabit.seq:5341/ingest/otlp
@@ -18,6 +21,7 @@ services:
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
   devhabit.postgres:
+    container_name: devhabit.postgres
     image: postgres:17.2 # or latest
     environment:
       POSTGRES_DB: devhabit
@@ -29,6 +33,7 @@ services:
       - 5432:5432
 
   devhabit.seq:
+    container_name: devhabit.seq
     image: datalust/seq:2024.3 # or latest
     environment:
       ACCEPT_EULA: "Y"
@@ -39,6 +44,7 @@ services:
       - 5341:80
 
   devhabit.aspire-dashboard:
+    container_name: devhabit.aspire-dashboard
     image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
     environment:
       DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
@@ -47,4 +53,4 @@ services:
 
 
 # docker compose -f docker-compose.yml -f docker-compose.debug.yml up --build
-# docker exec -it devhabit-devhabit.api-1 printenv ASPNETCORE_ENVIRONMENT
+# docker exec -it devhabit.api printenv ASPNETCORE_ENVIRONMENT
