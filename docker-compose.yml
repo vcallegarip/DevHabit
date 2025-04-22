@@ -49,7 +49,8 @@ services:
     environment:
       DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
     ports:
-      - 18888:18888
+      - 18888:18888  # UI for browser
+      - 18889:18889  # gRPC collector (API sends here)
 
 
 # docker compose -f docker-compose.yml -f docker-compose.debug.yml up --build
